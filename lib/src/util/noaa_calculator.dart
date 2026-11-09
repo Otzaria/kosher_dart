@@ -30,6 +30,29 @@ class NOAACalculator extends AstronomicalCalculator {
   /// Julian days per century
   static const double _JULIAN_DAYS_PER_CENTURY = 36525.0;
 
+  // A day's solar-noon declination and equation of time are independent of
+  // latitude, zenith and sunrise/sunset direction. Cache just one day/location.
+  double? _cachedNoonJulianDay;
+  double? _cachedNoonLongitude;
+  late double _noonEquationOfTime;
+  late double _noonSunDeclination;
+
+  void _ensureSolarNoonCache(double julianDay, double longitude) {
+    if (_cachedNoonJulianDay == julianDay &&
+        _cachedNoonLongitude == longitude) {
+      return;
+    }
+    final centuries = _getJulianCenturiesFromJulianDay(julianDay);
+    final noonMinutes = _getSolarNoonUTC(centuries, longitude);
+    final noonCenturies =
+        _getJulianCenturiesFromJulianDay(julianDay + noonMinutes / 1440.0);
+    _noonEquationOfTime = _getEquationOfTime(noonCenturies);
+    _noonSunDeclination = _getSunDeclination(noonCenturies);
+    // Publish the key after the values have been calculated.
+    _cachedNoonJulianDay = julianDay;
+    _cachedNoonLongitude = longitude;
+  }
+
   /// See also [AstronomicalCalculator.getCalculatorName].
   @override
   String getCalculatorName() {
@@ -301,8 +324,8 @@ class NOAACalculator extends AstronomicalCalculator {
     double sdRad = radians(solarDec);
     double x = (cos(radians(zenith)) / (cos(latRad) * cos(sdRad)) -
         tan(latRad) * tan(sdRad));
-    x = max(min(1, x), -1);
-    return acos(x); // in radians
+    // Do not clamp: no real crossing occurs on a polar day/night.
+    return acos(x); // NaN if sunrise is physically impossible
   }
 
   /// Returns the [hour angle](http://en.wikipedia.org/wiki/Hour_angle) of the sun at sunset for the
@@ -401,21 +424,12 @@ class NOAACalculator extends AstronomicalCalculator {
   /// - [zenith]: 
   ///   the zenith
   /// Returns the time in minutes from zero UTC
-  static double _getSunriseUTC(
+  double _getSunriseUTC(
       double julianDay, double latitude, double longitude, double zenith) {
-    double julianCenturies = _getJulianCenturiesFromJulianDay(julianDay);
-
-    // Find the time of solar noon at the location, and use that declination. This is better than start of the
-    // Julian day
-
-    double noonmin = _getSolarNoonUTC(julianCenturies, longitude);
-    double tnoon =
-        _getJulianCenturiesFromJulianDay(julianDay + noonmin / 1440.0);
-
-    // First pass to approximate sunrise (using solar noon)
-
-    double eqTime = _getEquationOfTime(tnoon);
-    double solarDec = _getSunDeclination(tnoon);
+    final julianCenturies = _getJulianCenturiesFromJulianDay(julianDay);
+    _ensureSolarNoonCache(julianDay, longitude);
+    double eqTime = _noonEquationOfTime;
+    double solarDec = _noonSunDeclination;
     double hourAngle = _getSunHourAngleAtSunrise(latitude, solarDec, zenith);
 
     double delta = longitude - degrees(hourAngle);
@@ -472,21 +486,12 @@ class NOAACalculator extends AstronomicalCalculator {
   /// - [zenith]: 
   ///   zenith
   /// Returns the time in minutes from zero Universal Coordinated Time (UTC)
-  static double _getSunsetUTC(
+  double _getSunsetUTC(
       double julianDay, double latitude, double longitude, double zenith) {
-    double julianCenturies = _getJulianCenturiesFromJulianDay(julianDay);
-
-    // Find the time of solar noon at the location, and use that declination. This is better than start of the
-    // Julian day
-
-    double noonmin = _getSolarNoonUTC(julianCenturies, longitude);
-    double tnoon =
-        _getJulianCenturiesFromJulianDay(julianDay + noonmin / 1440.0);
-
-    // First calculates sunrise and approx length of day
-
-    double eqTime = _getEquationOfTime(tnoon);
-    double solarDec = _getSunDeclination(tnoon);
+    final julianCenturies = _getJulianCenturiesFromJulianDay(julianDay);
+    _ensureSolarNoonCache(julianDay, longitude);
+    double eqTime = _noonEquationOfTime;
+    double solarDec = _noonSunDeclination;
     double hourAngle = _getSunHourAngleAtSunset(latitude, solarDec, zenith);
 
     double delta = longitude - degrees(hourAngle);

@@ -7,7 +7,8 @@ void main() {
       final calendar = JewishCalendar()
         ..setJewishDate(5782, JewishDate.TAMMUZ, 17);
       expect(calendar.getDayOfWeek(), JewishDate.saturday);
-      expect(calendar.getYomTovIndex(), isNot(JewishCalendar.SEVENTEEN_OF_TAMMUZ));
+      expect(
+          calendar.getYomTovIndex(), isNot(JewishCalendar.SEVENTEEN_OF_TAMMUZ));
       expect(calendar.isTaanis(), isFalse);
       calendar.forward();
       expect(calendar.getJewishDayOfMonth(), 18);
@@ -23,7 +24,8 @@ void main() {
       expect(calendar.getYomTovIndex(), JewishCalendar.SEVENTEEN_OF_TAMMUZ);
       expect(calendar.isTaanis(), isTrue);
       calendar.forward();
-      expect(calendar.getYomTovIndex(), isNot(JewishCalendar.SEVENTEEN_OF_TAMMUZ));
+      expect(
+          calendar.getYomTovIndex(), isNot(JewishCalendar.SEVENTEEN_OF_TAMMUZ));
     });
   });
 }

@@ -39,16 +39,26 @@ void main() {
       expect(formatter.format(startOfYear, pattern: 'D'), '2');
     });
 
-    test('yyy token does not duplicate the preceding year token', () {
+    test('a four-letter year pattern writes the year once', () {
       final formatter = HebrewDateFormatter();
       expect(formatter.format(gregorian, pattern: 'yyy'), '5784');
+      expect(formatter.format(gregorian, pattern: 'yyyy'), '5784');
+    });
+
+    test('minute token must not replace mm within Tammuz', () {
+      final tammuz = JewishDate.initDate(
+        jewishYear: 5784,
+        jewishMonth: JewishDate.TAMMUZ,
+        jewishDayOfMonth: 1,
+      );
+      final formatter = HebrewDateFormatter();
+      expect(formatter.format(tammuz, pattern: 'MM mm'), startsWith('Tammuz '));
     });
 
     test('Hebrew default formatting preserves date and month', () {
       final formatter = HebrewDateFormatter()..hebrewFormat = true;
       final output = formatter.format(gregorian);
-      expect(output, contains('סיוון'));
-      expect(output, contains('תש'));
+      expect(output, 'ה׳ סיוון תשפ״ד');
     });
   });
 

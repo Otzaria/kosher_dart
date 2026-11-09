@@ -575,6 +575,10 @@ class HebrewDateFormatter {
     }
   }
 
+  // One token scan, so formatted month/day text is never re-substituted.
+  static final RegExp _datePatternTokens =
+      RegExp(r'yyy|yy|dd|MM|mm|hh|HH|ss|[aED]|[/\-: ]');
+
   /// Formats the Jewish date. The default format is "day Month year", for example if the formatter is set to Hebrew
   /// it will כ״א שבט תשכ״ט, and the format "21 Shevat, 5729" if not. The format can be change by pattern variable.
   /// The following symbol are available in explicit patterns:
@@ -599,11 +603,6 @@ class HebrewDateFormatter {
   /// Returns the formatted date.
   /// If the formatter is set to Hebrew, it will format in the form, "day Month year"
   /// by default for example כ״א שבט תשכ״ט, and the format "21 Shevat, 5729" if not.
-  // A single token scan avoids repeated RegExp compilation and replaceAll passes
-  // (and never substitutes token letters inside the formatted month/day text).
-  static final RegExp _datePatternTokens =
-      RegExp(r'yyy|yy|dd|MM|mm|hh|HH|ss|[aED]|[/\-: ]');
-
   String format(JewishDate jewishDate, {String pattern = 'dd MM yy'}) {
     final buffer = StringBuffer();
     DateTime? gregorian;
@@ -637,7 +636,7 @@ class HebrewDateFormatter {
         case 'ss':
         case 'a':
           gregorian ??= jewishDate.getGregorianCalendar();
-          buffer.write(DateFormat(token).format(gregorian!));
+          buffer.write(DateFormat(token).format(gregorian));
           break;
         default:
           buffer.write(token);

@@ -26,7 +26,7 @@ void main() {
     test('known century leap-day offsets match DateTime UTC', () {
       for (final start in dates) {
         final first = JewishDate.fromDateTime(start);
-        for (final days in [1, 28, 31, 32, 59, 365, 1000]) {
+        for (final days in [1, 28, 31, 32, 59, 63, 64, 365, 1000]) {
           final stepped = JewishDate.fromDateTime(start);
           stepped.forward(Calendar.DATE, days);
           final expected = JewishDate.fromDateTime(
@@ -41,7 +41,7 @@ void main() {
   group('bulk day navigation', () {
     test('bulk forward is identical to repeated daily increments', () {
       for (final start in dates) {
-        for (final days in [31, 32, 33, 100, 365, 1000]) {
+        for (final days in [31, 32, 33, 63, 64, 65, 100, 365, 1000]) {
           final bulk = JewishDate.fromDateTime(start);
           final stepped = JewishDate.fromDateTime(start);
           bulk.forward(Calendar.DATE, days);
@@ -55,7 +55,7 @@ void main() {
 
     test('bulk backwards is identical to repeated daily decrements', () {
       for (final start in dates) {
-        for (final days in [31, 32, 33, 100, 365, 1000]) {
+        for (final days in [31, 32, 33, 63, 64, 65, 100, 365, 1000]) {
           final bulk = JewishDate.fromDateTime(start);
           final stepped = JewishDate.fromDateTime(start);
           bulk.back(Calendar.DATE, days);

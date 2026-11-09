@@ -1117,7 +1117,7 @@ class JewishDate implements Comparable<JewishDate> {
     if (field == Calendar.DATE) {
       // A large date jump need not visit every intervening day.
       // For small movements preserve the cheap increment-only path.
-      if (amount >= 32) {
+      if (amount >= 64) {
         _absDateToDate(_gregorianAbsDate + amount);
         return;
       }
@@ -1252,7 +1252,7 @@ class JewishDate implements Comparable<JewishDate> {
       throw ArgumentError(
           "JewishDate.back() does not support amounts less than 1. See JewishDate.forward()");
     }
-    if (amount >= 32 && _gregorianAbsDate > amount) {
+    if (amount >= 64 && _gregorianAbsDate > amount) {
       _absDateToDate(_gregorianAbsDate - amount);
       return;
     }

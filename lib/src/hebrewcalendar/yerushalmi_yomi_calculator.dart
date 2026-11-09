@@ -88,22 +88,15 @@ class YerushalmiYomiCalculator {
   /// The first Daf Yomi cycle started on 15 Shevat (Tu Bishvat), 5740 (February, 2, 1980) and calculations
   /// prior to this date will result in an IllegalArgumentException thrown.
   ///
-  /// - [calendar]: 
+  /// - [calendar]:
   ///   the calendar date for calculation
   /// Returns the [Daf].
   ///
-  /// Throws [ArgumentError] 
+  /// Throws [ArgumentError]
   ///             if the date is prior to the September 11, 1923 start date of the first Daf Yomi cycle
   static Daf getDafYomiYerushalmi(JewishCalendar calendar) {
-    final requested = DateTime.utc(
-        calendar.getGregorianYear(),
-        calendar.getGregorianMonth(),
-        calendar.getGregorianDayOfMonth());
-
-    if (requested.isBefore(_startDayUtc)) {
-      throw ArgumentError(
-          "$requested is prior to organized Daf Yomi Yerushalmi cycles that started on $dafYomiStartDay");
-    }
+    final requested = DateTime.utc(calendar.getGregorianYear(),
+        calendar.getGregorianMonth(), calendar.getGregorianDayOfMonth());
 
     // There is no Daf Yomi Yerushalmi on Yom Kippur or the observed
     // Tisha B'Av fast (10 Av if 9 Av falls on Shabbos).
@@ -111,6 +104,11 @@ class YerushalmiYomiCalculator {
     if (holiday == JewishCalendar.YOM_KIPPUR ||
         holiday == JewishCalendar.TISHA_BEAV) {
       return Daf(39, 0);
+    }
+
+    if (requested.isBefore(_startDayUtc)) {
+      throw ArgumentError(
+          "$requested is prior to organized Daf Yomi Yerushalmi cycles that started on $dafYomiStartDay");
     }
 
     var cycleStart = _startDayUtc;
@@ -124,8 +122,8 @@ class YerushalmiYomiCalculator {
         // it is a skipped day, not the first daf of the next cycle.
         final skipped = _getNumOfSpecialDays(
             cycleStart, cycleEnd.add(const Duration(days: 1)));
-        final correctedEnd = cycleStart.add(
-            Duration(days: WHOLE_SHAS_DAFS + skipped));
+        final correctedEnd =
+            cycleStart.add(Duration(days: WHOLE_SHAS_DAFS + skipped));
         if (correctedEnd.isAtSameMomentAs(cycleEnd)) {
           break;
         }
@@ -160,8 +158,10 @@ class YerushalmiYomiCalculator {
     final endYear = JewishCalendar.fromDateTime(end).getJewishYear();
     var skipped = 0;
 
-    final yomKippur = JewishCalendar();
-    final tishaBeav = JewishCalendar();
+    // initDate fixes the time at noon, so _isBetween counts the start day.
+    final yomKippur =
+        JewishCalendar.initDate(startYear, JewishDate.TISHREI, 10);
+    final tishaBeav = JewishCalendar.initDate(startYear, JewishDate.AV, 9);
     for (var year = startYear; year <= endYear; year++) {
       yomKippur.setJewishDate(year, JewishDate.TISHREI, 10);
       tishaBeav.setJewishDate(year, JewishDate.AV, 9);
@@ -189,9 +189,4 @@ class YerushalmiYomiCalculator {
   static bool _isBetween(DateTime start, DateTime date, DateTime end) {
     return start.isBefore(date) && end.isAfter(date);
   }
-
-  /// Return the number of days between the dates passed in
-  /// - [start]: the start date
-  /// - [end]: the end date
-  /// Returns the number of days between the start and end dates
 }

@@ -51,6 +51,11 @@ void main() {
       expect(() => dafAt(DateTime.utc(1980, 2, 1)), throwsArgumentError);
     });
 
+    test('a fast before the first cycle still reports no daf', () {
+      // Yom Kippur 5740.
+      expectDaf(DateTime.utc(1979, 10, 1), 39, 0);
+    });
+
     test('normalization ignores time of day and local/UTC constructors', () {
       final a = dafAt(DateTime.utc(2024, 6, 15, 12, 30));
       final b = dafAt(DateTime(2024, 6, 15, 23, 45));

@@ -120,7 +120,10 @@ class YerushalmiYomiCalculator {
       // Each skipped fast extends the cycle by one civil day. Recount until
       // stable because an extension can itself include another skipped day.
       while (true) {
-        final skipped = _getNumOfSpecialDays(cycleStart, cycleEnd);
+        // Include a fast that falls exactly on the tentative cycle boundary:
+        // it is a skipped day, not the first daf of the next cycle.
+        final skipped = _getNumOfSpecialDays(
+            cycleStart, cycleEnd.add(const Duration(days: 1)));
         final correctedEnd = cycleStart.add(
             Duration(days: WHOLE_SHAS_DAFS + skipped));
         if (correctedEnd.isAtSameMomentAs(cycleEnd)) {

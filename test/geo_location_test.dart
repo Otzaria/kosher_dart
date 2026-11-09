@@ -174,10 +174,9 @@ void main() {
   });
 
   group('GeoLocation - DMS correctness and validation', () {
-    test('longitude DMS works before any decimal longitude is set', () {
+    test('DMS east longitude converts to a positive decimal', () {
       final g = GeoLocation();
-      g.setLongitude(
-          degrees: 35, minutes: 14, seconds: 43.0, direction: 'E');
+      g.setLongitude(degrees: 35, minutes: 14, seconds: 43.0, direction: 'E');
       expect(g.getLongitude(), closeTo(35.245278, 0.000001));
     });
 
@@ -185,8 +184,26 @@ void main() {
       final g = GeoLocation();
       g.setLongitude(degrees: 74, minutes: 12, seconds: 0, direction: 'W');
       expect(g.getLongitude(), closeTo(-74.2, 0.000001));
+      g.setLongitude(degrees: 73, minutes: 30, seconds: 0, direction: 'W');
+      expect(g.getLongitude(), closeTo(-73.5, 0.000001));
       g.setLongitude(degrees: 35, minutes: 15, seconds: 0, direction: 'E');
       expect(g.getLongitude(), closeTo(35.25, 0.000001));
+    });
+
+    test('accepts minutes and seconds just below 60', () {
+      final g = GeoLocation();
+      g.setLatitude(degrees: 31, minutes: 59, seconds: 59.999, direction: 'N');
+      g.setLongitude(degrees: 34, minutes: 59, seconds: 59.999, direction: 'E');
+      expect(g.getLatitude(), closeTo(32, 0.000001));
+      expect(g.getLongitude(), closeTo(35, 0.000001));
+    });
+
+    test('rejects partial DMS input', () {
+      final g = GeoLocation();
+      expect(() => g.setLatitude(degrees: 31, minutes: 0, direction: 'N'),
+          throwsArgumentError);
+      expect(() => g.setLongitude(degrees: 35, minutes: 0, seconds: 0),
+          throwsArgumentError);
     });
 
     test('DMS limits include exact poles and antimeridian', () {
@@ -236,7 +253,11 @@ void main() {
 
     test('rejects NaN and infinite decimal coordinates and elevation', () {
       final g = GeoLocation();
-      for (final invalid in [double.nan, double.infinity, double.negativeInfinity]) {
+      for (final invalid in [
+        double.nan,
+        double.infinity,
+        double.negativeInfinity
+      ]) {
         expect(() => g.setLatitude(latitude: invalid), throwsArgumentError);
         expect(() => g.setLongitude(longitude: invalid), throwsArgumentError);
         expect(() => g.setElevation(invalid), throwsArgumentError);

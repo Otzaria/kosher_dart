@@ -193,8 +193,7 @@ class GeoLocation {
         minutes == null ||
         seconds == null ||
         direction == null) {
-      throw ArgumentError(
-          "Longitude must be between 0 and  180.  Use a direction of W instead of negative.");
+      throw ArgumentError("Specify either longitude or all DMS components.");
     } else {
       if (degrees < 0 ||
           minutes < 0 ||

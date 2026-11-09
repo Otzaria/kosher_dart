@@ -69,22 +69,6 @@ class HebrewDateFormatter {
   /// that is similar to a single quote and is used in formatting Hebrew numbers.
   static const String _GERSHAYIM = "״";
 
-  // These immutable lookup tables were previously allocated anew on every
-  // formatHebrewNumber() call, including each day rendered by calendars.
-  static const List<String> _numberHundreds = [
-    "", "ק", "ר", "ש", "ת", "תק", "תר", "תש", "תת", "תתק"
-  ];
-  static const List<String> _numberTens = [
-    "", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"
-  ];
-  static const List<String> _numberTenEnds = [
-    "", "י", "ך", "ל", "ם", "ן", "ס", "ע", "ף", "ץ"
-  ];
-  static const List<String> _numberFifteenSixteen = ["טו", "טז"];
-  static const List<String> _numberOnes = [
-    "", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"
-  ];
-
   /// Hebrew Omer prefix. By default it is the letter ב, but can be set to ל (or any other prefix).
   String hebrewOmerPrefix = "ב";
 
@@ -861,11 +845,22 @@ class HebrewDateFormatter {
     const String ALAFIM = "אלפים";
     const String EFES = "אפס";
 
-    final jHundreds = _numberHundreds;
-    final jTens = _numberTens;
-    final jTenEnds = _numberTenEnds;
-    final tavTaz = _numberFifteenSixteen;
-    final jOnes = _numberOnes;
+    const jHundreds = <String>[
+      "",
+      "ק",
+      "ר",
+      "ש",
+      "ת",
+      "תק",
+      "תר",
+      "תש",
+      "תת",
+      "תתק"
+    ];
+    const jTens = <String>["", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"];
+    const jTenEnds = <String>["", "י", "ך", "ל", "ם", "ן", "ס", "ע", "ף", "ץ"];
+    const tavTaz = <String>["טו", "טז"];
+    const jOnes = <String>["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"];
 
     if (number == 0) {
       // do we really need this? Should it be applicable to a date?

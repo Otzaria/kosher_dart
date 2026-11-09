@@ -23,6 +23,12 @@ void main() {
       expectDaf(DateTime.utc(1984, 5, 14), 0, 2);
     });
 
+    test('a fast on the tentative cycle boundary extends that cycle', () {
+      // 10 Tishrei 5997 is 2236-10-10, when a cycle would otherwise end.
+      expectDaf(DateTime.utc(2236, 10, 10), 39, 0);
+      expectDaf(DateTime.utc(2236, 10, 11), 0, 1);
+    });
+
     test('historical schedule anchors remain unchanged', () {
       expectDaf(DateTime.utc(1983, 11, 7), 32, 26);
       expectDaf(DateTime.utc(2017, 9, 1), 29, 8);

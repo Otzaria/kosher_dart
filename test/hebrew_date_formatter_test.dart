@@ -47,7 +47,7 @@ void main() {
     test('Hebrew default formatting preserves date and month', () {
       final formatter = HebrewDateFormatter()..hebrewFormat = true;
       final output = formatter.format(gregorian);
-      expect(output, contains('סיון'));
+      expect(output, contains('סיוון'));
       expect(output, contains('תש'));
     });
   });

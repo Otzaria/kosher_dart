@@ -10,6 +10,6 @@ void main() {
     date.back(Calendar.DATE, 365);
   }
   sw.stop();
-  print('Date navigation iterations: ' + iterations.toString() +
-      ', elapsed microseconds: ' + sw.elapsedMicroseconds.toString());
+  print('Date navigation iterations: $iterations, '
+      'elapsed microseconds: ${sw.elapsedMicroseconds}');
 }

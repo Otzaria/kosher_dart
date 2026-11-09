@@ -387,6 +387,23 @@ class JewishDate implements Comparable<JewishDate> {
     return _gregorianAbsDate;
   }
 
+  // Days before each 1-indexed Gregorian month in a common year; slot 0 is unused.
+  static const List<int> _daysBeforeGregorianMonth = [
+    0,
+    0,
+    31,
+    59,
+    90,
+    120,
+    151,
+    181,
+    212,
+    243,
+    273,
+    304,
+    334
+  ];
+
   /// Computes the absolute date from a Gregorian date. ND+ER
   ///
   /// - [year]:
@@ -397,17 +414,12 @@ class JewishDate implements Comparable<JewishDate> {
   /// - [dayOfMonth]:
   ///   the day of the month (1st, 2nd, etc...)
   /// Returns the absolute Gregorian day
-  // 1-indexed Gregorian months. The first slot is unused.
-  static const List<int> _daysBeforeGregorianMonth = [
-    0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334,
-  ];
-
   static int _gregorianDateToAbsDate(int year, int month, int dayOfMonth) {
     final priorYear = year - 1;
-    final leapDay = month > 2 &&
-            ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
-        ? 1
-        : 0;
+    final leapDay =
+        month > 2 && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+            ? 1
+            : 0;
     return dayOfMonth +
         _daysBeforeGregorianMonth[month] +
         leapDay +
